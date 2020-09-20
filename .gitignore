@@ -1,3 +1,5 @@
 *.txt
 *.ipynb
 .vscode/
+__pycache__/
+toymvc.py
