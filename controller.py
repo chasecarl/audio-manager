@@ -18,6 +18,12 @@ class Controller:
 
     def __init__(self, root):
         self.view = MainView(root)
+        samples = self.load_samples()
+        self.view.display_samples(samples)
+    
+
+    def load_samples(self):
+        return ['Ani', 'Ata', 'Shalom']
 
 
 if __name__ == '__main__':
