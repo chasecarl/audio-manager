@@ -1,4 +1,6 @@
 import numpy as np
+import tkinter as tk
+from view import MainView
 
 
 def join(iterable, on):
@@ -11,3 +13,15 @@ def join(iterable, on):
         joined_iterable.append(el)
     return np.concatenate(joined_iterable, axis=0)
 
+
+class Controller:
+
+    def __init__(self, root):
+        self.view = MainView(root)
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.withdraw()
+    app = Controller(root)
+    root.mainloop()
