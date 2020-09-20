@@ -12,7 +12,7 @@ class MainView(tk.Toplevel):
         tk.Toplevel.__init__(self, master)
         self.protocol('WM_DELETE_WINDOW', self.master.destroy)
         self.title(TITLE)
-        
+
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side='top', expand=True, fill='both')
         if debugging():
