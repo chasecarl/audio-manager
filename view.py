@@ -4,6 +4,9 @@ from util import debugging
 
 TITLE = 'Audio Manager'
 LABEL_TEXT = 'My Database'
+ADD_TEXT = 'Add'
+REMOVE_TEXT = 'Remove'
+RENAME_TEXT = 'Rename'
 
 
 class MainView(tk.Toplevel):
@@ -18,11 +21,29 @@ class MainView(tk.Toplevel):
         if debugging():
             self.top_frame.config(bg='red')
 
+        # self.top_top = tk.Frame(self.top_frame)
+        # self.top_top.pack(side='top', expand=True, fill='x')
+
         self.label = tk.Label(self.top_frame, text=LABEL_TEXT)
         self.label.pack(side='top', anchor='w')
 
-        self.sample_list = tk.Listbox(self.top_frame, selectmode='extended')
+        self.top_left = tk.Frame(self.top_frame)
+        self.top_left.pack(side='left', expand=True, fill='both')
+
+        self.sample_list = tk.Listbox(self.top_left, selectmode='extended')
         self.sample_list.pack(side='top', anchor='w')
+
+        self.top_right = tk.Frame(self.top_frame)
+        self.top_right.pack(side='right', expand=True, fill='both')
+
+        self.add_button = tk.Button(self.top_right, text=ADD_TEXT)
+        self.add_button.pack(side='top', anchor='center')
+
+        self.remove_button = tk.Button(self.top_right, text=REMOVE_TEXT, state=tk.DISABLED)
+        self.remove_button.pack(side='top', anchor='center')
+
+        self.rename_button = tk.Button(self.top_right, text=RENAME_TEXT, state=tk.DISABLED)
+        self.rename_button.pack(side='top', anchor='center')
 
         self.bot_frame = tk.Frame(self)
         self.bot_frame.pack(side='bottom', expand=True, fill='both')
