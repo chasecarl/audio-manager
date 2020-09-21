@@ -1,4 +1,7 @@
 import tkinter as tk
+import logging
+
+
 from util import debugging
 
 
@@ -21,9 +24,6 @@ class MainView(tk.Toplevel):
         if debugging():
             self.top_frame.config(bg='red')
 
-        # self.top_top = tk.Frame(self.top_frame)
-        # self.top_top.pack(side='top', expand=True, fill='x')
-
         self.label = tk.Label(self.top_frame, text=LABEL_TEXT)
         self.label.pack(side='top', anchor='w')
 
@@ -31,6 +31,7 @@ class MainView(tk.Toplevel):
         self.top_left.pack(side='left', expand=True, fill='both')
 
         self.sample_list = tk.Listbox(self.top_left, selectmode='extended')
+        self.sample_list.bind('<<ListboxSelect>>', lambda e: self._listbox_select_handler())
         self.sample_list.pack(side='top', anchor='w')
 
         self.top_right = tk.Frame(self.top_frame)
@@ -55,3 +56,18 @@ class MainView(tk.Toplevel):
         self.sample_list.delete(0, tk.END)
         for sample in samples:
             self.sample_list.insert(tk.END, sample)
+
+
+    def _listbox_select_handler(self):
+        selection_size = len(self.sample_list.curselection())
+        logging.debug(f'Selection size is {selection_size}')
+        # remove button logic
+        if selection_size >= 1:
+            self.remove_button.config(state=tk.NORMAL)
+        else:
+            self.remove_button.config(state=tk.DISABLED)
+        # rename button logic
+        if selection_size == 1:
+            self.rename_button.config(state=tk.NORMAL)
+        else:
+            self.rename_button.config(state=tk.DISABLED)
