@@ -10,8 +10,8 @@ class EntryModel:
     def __init__(self, entry_path):
         self._entry_path = entry_path
         with open(self._entry_path) as entry_fd:
-            self.name = next(entry_fd)
-            self.audio_path = next(entry_fd)
+            self.name = next(entry_fd).strip()
+            self.audio_path = next(entry_fd).strip()
 
 
     def set_name(self, name):
