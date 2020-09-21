@@ -65,5 +65,7 @@ class ListModel(list):
             return
         if len(self.selected) > 1:
             logging.warning(f'M: Remove is called with more than one entry selected. Removing the first one.')
-        self.remove(self.selected[0])
+        to_remove = self.selected[0]
+        self.remove(to_remove)
+        os.remove(to_remove._entry_path)
         self._do_callbacks()
