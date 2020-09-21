@@ -10,6 +10,8 @@ LABEL_TEXT = 'My Database'
 ADD_TEXT = 'Add'
 REMOVE_TEXT = 'Remove'
 RENAME_TEXT = 'Rename'
+PLAY_TEXT = 'Play'
+CONCAT_TEXT = 'Merge Audio'
 
 
 class MainView(tk.Toplevel):
@@ -51,6 +53,12 @@ class MainView(tk.Toplevel):
         if debugging():
             self.bot_frame.config(bg='blue')
 
+        self.play_button = tk.Button(self.bot_frame, state=tk.DISABLED, text=PLAY_TEXT)
+        self.play_button.pack(side='left')
+
+        self.concat_button = tk.Button(self.bot_frame, state=tk.DISABLED, text=CONCAT_TEXT)
+        self.concat_button.pack(side='left')
+
 
     def display_samples(self, samples):
         self.sample_list.delete(0, tk.END)
@@ -71,3 +79,13 @@ class MainView(tk.Toplevel):
             self.rename_button.config(state=tk.NORMAL)
         else:
             self.rename_button.config(state=tk.DISABLED)
+        # play button logic
+        if selection_size == 1:
+            self.play_button.config(state=tk.NORMAL)
+        else:
+            self.play_button.config(state=tk.DISABLED)
+        # cocnat button logic
+        if selection_size > 1:
+            self.concat_button.config(state=tk.NORMAL)
+        else:
+            self.concat_button.config(state=tk.DISABLED)
