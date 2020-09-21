@@ -66,13 +66,16 @@ class MainView(tk.Toplevel):
         self.sample_list.delete(0, tk.END)
         for sample in samples:
             self.sample_list.insert(tk.END, sample)
+        self._do_callbacks()
 
 
     def add_callback(self, func):
         self.callbacks.append(func)
 
+
     def _from_indices(self, indices):
         return [self.sample_list.get(i) for i in indices]
+
 
     def _do_callbacks(self):
         for func in self.callbacks:

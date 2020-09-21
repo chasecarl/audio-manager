@@ -38,6 +38,7 @@ class ListModel(list):
             if entry_path.endswith(ENTRY_EXT):
                 self.append(EntryModel(os.path.join(ListModel.ENTRIES_FOLDER_PATH, entry_path)))
         self.selected = []
+        self.callbacks = []
 
 
     def set_selected(self, selection):
@@ -47,3 +48,22 @@ class ListModel(list):
 
     def _str_selected(self):
         return '[' + ', '.join(str(entry) for entry in self.selected) + ']'
+
+
+    def add_callback(self, func):
+        self.callbacks.append(func)
+
+
+    def _do_callbacks(self):
+        for func in self.callbacks:
+            func()
+
+
+    def remove_entry(self):
+        if len(self.selected) == 0:
+            logging.error(f'M: Remove is called with an empty selection. Not removing.')
+            return
+        if len(self.selected) > 1:
+            logging.warning(f'M: Remove is called with more than one entry selected. Removing the first one.')
+        self.remove(self.selected[0])
+        self._do_callbacks()
