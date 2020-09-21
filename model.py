@@ -1,4 +1,5 @@
 import os
+import logging
 
 
 ENTRY_EXT = '.amf'
@@ -35,4 +36,14 @@ class ListModel(list):
         list.__init__(self)
         for entry_path in os.listdir(ListModel.ENTRIES_FOLDER_PATH):
             if entry_path.endswith(ENTRY_EXT):
-                self.append(EntryModel(os.join((ListModel.ENTRIES_FOLDER_PATH, entry_path))))
+                self.append(EntryModel(os.path.join(ListModel.ENTRIES_FOLDER_PATH, entry_path)))
+        self.selected = []
+
+
+    def set_selected(self, selection):
+        self.selected = [entry for entry in self if entry.name in selection]
+        logging.debug(f'M: Current selection is: {self._str_selected()}.')
+
+
+    def _str_selected(self):
+        return '[' + ', '.join(str(entry) for entry in self.selected) + ']'

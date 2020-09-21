@@ -1,6 +1,10 @@
 import numpy as np
 import tkinter as tk
+import logging
+
+
 from view import MainView
+from model import ListModel
 
 
 def join(iterable, on):
@@ -17,13 +21,15 @@ def join(iterable, on):
 class Controller:
 
     def __init__(self, root):
+        self.model = ListModel()
         self.view = MainView(root)
-        samples = self.load_samples()
-        self.view.display_samples(samples)
-    
+        self.view.add_callback(self.selection_changed)
+        self.view.display_samples(self.model)
 
-    def load_samples(self):
-        return ['Ani', 'Ata', 'Shalom']
+
+    def selection_changed(self, selection):
+        logging.debug(f'C: Passing the following selection to the model: {str(selection)}')
+        self.model.set_selected(selection)
 
 
 if __name__ == '__main__':

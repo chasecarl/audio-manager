@@ -21,6 +21,8 @@ class MainView(tk.Toplevel):
         self.protocol('WM_DELETE_WINDOW', self.master.destroy)
         self.title(TITLE)
 
+        self.callbacks = []
+
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side='top', expand=True, fill='both')
         if debugging():
@@ -66,9 +68,21 @@ class MainView(tk.Toplevel):
             self.sample_list.insert(tk.END, sample)
 
 
+    def add_callback(self, func):
+        self.callbacks.append(func)
+
+    def _from_indices(self, indices):
+        return [self.sample_list.get(i) for i in indices]
+
+    def _do_callbacks(self):
+        for func in self.callbacks:
+            func(self._from_indices(self.sample_list.curselection()))
+
+
     def _listbox_select_handler(self):
+        self._do_callbacks()
         selection_size = len(self.sample_list.curselection())
-        logging.debug(f'Selection size is {selection_size}')
+        logging.debug(f'V: Selection size is {selection_size}')
         # remove button logic
         if selection_size >= 1:
             self.remove_button.config(state=tk.NORMAL)
