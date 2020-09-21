@@ -17,6 +17,9 @@ if not logging_level:
     logging.basicConfig(level=logging.INFO)
 else:
     logging.basicConfig(level=logging.DEBUG)
+logging.getLogger('numba.core.ssa').setLevel(logging.ERROR)
+logging.getLogger('numba.core.byteflow').setLevel(logging.ERROR)
+logging.getLogger('numba.core.interpreter').setLevel(logging.ERROR)
 
 
 def debugging():

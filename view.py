@@ -95,6 +95,10 @@ class RenameView(tk.Toplevel):
 
     def __init__(self, master):
 
+        tk.Toplevel.__init__(self, master)
+        self.master = master
+        self.title(RENAME_TITLE)
+
         self.name_frame = tk.Frame(self)
         self.name_frame.pack(side='top', expand=True, fill='both')
 

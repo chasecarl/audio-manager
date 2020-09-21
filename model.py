@@ -2,11 +2,25 @@ import os
 import logging
 import librosa
 import soundfile as sf
+import numpy as np
 
 
 ENTRY_EXT = '.amf'
 
 ENTRIES_FOLDER_PATH = 'res'
+
+PAUSE_SECS = 2
+
+
+def join(iterable, on):
+    # assuming all the inputs have the same number of channels (shape[1])
+    it = iter(iterable)
+    # asssuming there is at least one object in the iterable
+    joined_iterable = [next(it)]
+    for el in it:
+        joined_iterable.append(on)
+        joined_iterable.append(el)
+    return np.concatenate(joined_iterable, axis=0)
 
 
 class EntryModel:
@@ -105,4 +119,20 @@ class ListModel(list):
 
 
     def concat_audio(self, audio_filename):
-        pass
+        if len(self.selected) < 2:
+            logging.error(f'M: Audio concatenation function is called with less than two entries selected. Aborting.')
+            return
+        sr = -1
+        on = None
+        split_result = []
+        for sample in self.selected:
+            audio, sample_sr = sample.load_audio()
+            if sr == -1:
+                sr = sample_sr
+                on = np.empty((PAUSE_SECS * sr, ))
+            if sample_sr != sr:
+                logging.warning(f'M: Audio samples have different sampling rate, writing with the first encountered one.')
+            split_result.append(audio)
+        result = join(split_result, on)
+        sf.write(audio_filename, result, sr)
+        logging.debug(f'M: Concatenated audio was written successfully!')
