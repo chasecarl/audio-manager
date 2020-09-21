@@ -3,9 +3,14 @@ import logging
 
 
 ENV_DEBUG_VARNAME = 'AMDEBUG'
+ENV_LOGGING_LEVEL_VARNAME = 'LOGLEVEL'
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging_level = os.environ.get(ENV_LOGGING_LEVEL_VARNAME)
+if not logging_level:
+    logging.basicConfig(level=logging.INFO)
+else:
+    logging.basicConfig(level=logging.DEBUG)
 
 
 def debugging():
