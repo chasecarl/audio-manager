@@ -31,7 +31,7 @@ class EntryModel:
         self.name = name
         with open(self._entry_path, 'w') as entry_fd:
             entry_fd.writelines((
-                self.name,
+                f'{self.name}\n',
                 self.audio_path
             ))
             entry_fd.truncate()
@@ -80,9 +80,19 @@ class ListModel(list):
         if len(self.selected) == 0:
             logging.error(f'M: Remove is called with an empty selection. Not removing.')
             return
+        for to_remove in self.selected:
+            self.remove(to_remove)
+            os.remove(to_remove._entry_path)
+        self._do_callbacks()
+
+
+    def rename_entry(self, name):
+        if len(self.selected) == 0:
+            logging.error(f'M: Rename is called with an empty selection. Not removing.')
+            return
         if len(self.selected) > 1:
-            logging.warning(f'M: Remove is called with more than one entry selected. Removing the first one.')
-        to_remove = self.selected[0]
-        self.remove(to_remove)
-        os.remove(to_remove._entry_path)
+            logging.error(f'M: Rename is called with more than one entry selected. Not renaming.')
+            return
+        to_rename = self.selected[0]
+        to_rename.set_name(name)
         self._do_callbacks()

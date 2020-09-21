@@ -29,6 +29,7 @@ class Controller:
         self.view.display_samples(self.model)
         self.view.add_button.config(command=self.add_entry)
         self.view.remove_button.config(command=self.remove_entry)
+        self.view.rename_button.config(command=self.rename_entry)
 
 
     def selection_changed(self, **kwargs):
@@ -45,6 +46,13 @@ class Controller:
         self.model.add_entry(name, path)
 
 
+    def entry_renamed(self, **kwargs):
+        name = kwargs[NAME]
+        self.view.remove_callback(self.entry_renamed)
+        logging.debug(f'C: Passing the following entry name to the model: {name}')
+        self.model.rename_entry(name)
+
+
     def model_changed(self):
         self.view.display_samples(self.model)
 
@@ -56,6 +64,11 @@ class Controller:
 
     def remove_entry(self):
         self.model.remove_entry()
+
+
+    def rename_entry(self):
+        self.view.rename_entry_dialog()
+        self.view.add_callback(self.entry_renamed)
 
 
 if __name__ == '__main__':

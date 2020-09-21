@@ -14,7 +14,9 @@ RENAME_TEXT = 'Rename'
 PLAY_TEXT = 'Play'
 CONCAT_TEXT = 'Merge Audio'
 ADD_TITLE = 'Add Entry'
+RENAME_TITLE = 'Rename Entry'
 ENTRY_NAME_TEXT = 'Name:'
+NEW_ENTRY_NAME_TEXT = 'New name:'
 ENTRY_PATH_TEXT = 'Audio file path:'
 BROWSE_BUTTON_TEXT = '...'
 ACCEPT_BUTTON_TEXT = 'OK'
@@ -73,9 +75,45 @@ class AddView(tk.Toplevel):
         if self.name_entry.get() == '' or self.path_entry.get() == '':
             logging.debug(f'M: The name or the path were empty. Nothing was added.')
             return
-        # TODO add
         self.master._add_entry(self.name_entry.get(), self.path_entry.get())
         logging.debug(f'M: The entry was added successfully.')
+        self.grab_release()
+        self.destroy()
+
+
+class RenameView(tk.Toplevel):
+
+    def __init__(self, master):
+        tk.Toplevel.__init__(self, master)
+        self.master = master
+        self.title(RENAME_TITLE)
+
+        self.name_frame = tk.Frame(self)
+        self.name_frame.pack(side='top', expand=True, fill='both')
+
+        self.name_label = tk.Label(self.name_frame, text=NEW_ENTRY_NAME_TEXT)
+        self.name_label.pack(side='left')
+
+        self.name_entry = tk.Entry(self.name_frame)
+        self.name_entry.pack(side='left')
+
+        self.accept_frame = tk.Frame(self)
+        self.accept_frame.pack(side='bottom', expand=True, fill='both')
+
+        self.accept_button = tk.Button(
+            self.accept_frame,
+            text=ACCEPT_BUTTON_TEXT,
+            command=self._rename_entry
+        )
+        self.accept_button.pack(side='left')
+
+
+    def _rename_entry(self):
+        if self.name_entry.get() == '':
+            logging.debug(f'M: The name was empty. Nothing was added.')
+            return
+        self.master._rename_entry(self.name_entry.get())
+        logging.debug(f'M: The entry was renamed successfully.')
         self.grab_release()
         self.destroy()
 
@@ -190,7 +228,17 @@ class MainView(tk.Toplevel):
         dialog.grab_set()
 
 
+    def rename_entry_dialog(self):
+        dialog = RenameView(self)
+        dialog.grab_set()
+
+
     def _add_entry(self, name, path):
         self.entry_name = name
         self.new_entry_path = path
+        self._do_callbacks()
+
+
+    def _rename_entry(self, name):
+        self.entry_name = name
         self._do_callbacks()
