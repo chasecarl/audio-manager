@@ -6,6 +6,11 @@ ENV_DEBUG_VARNAME = 'AMDEBUG'
 ENV_LOGGING_LEVEL_VARNAME = 'LOGLEVEL'
 
 
+SELECTION = 'selection'
+NAME = 'name'
+PATH = 'path'
+
+
 logging_level = os.environ.get(ENV_LOGGING_LEVEL_VARNAME)
 if not logging_level:
     logging.basicConfig(level=logging.INFO)

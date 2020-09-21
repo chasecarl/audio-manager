@@ -1,8 +1,9 @@
 import tkinter as tk
+from tkinter import filedialog
 import logging
 
 
-from util import debugging
+from util import *
 
 
 TITLE = 'Audio Manager'
@@ -12,6 +13,71 @@ REMOVE_TEXT = 'Remove'
 RENAME_TEXT = 'Rename'
 PLAY_TEXT = 'Play'
 CONCAT_TEXT = 'Merge Audio'
+ADD_TITLE = 'Add Entry'
+ENTRY_NAME_TEXT = 'Name:'
+ENTRY_PATH_TEXT = 'Audio file path:'
+BROWSE_BUTTON_TEXT = '...'
+ACCEPT_BUTTON_TEXT = 'OK'
+
+
+class AddView(tk.Toplevel):
+
+    def __init__(self, master):
+        tk.Toplevel.__init__(self, master)
+        self.master = master
+        self.title(ADD_TITLE)
+
+        self.name_frame = tk.Frame(self)
+        self.name_frame.pack(side='top', expand=True, fill='both')
+
+        self.name_label = tk.Label(self.name_frame, text=ENTRY_NAME_TEXT)
+        self.name_label.pack(side='left')
+
+        self.name_entry = tk.Entry(self.name_frame)
+        self.name_entry.pack(side='left')
+
+        self.path_frame = tk.Frame(self)
+        self.path_frame.pack(side='top', expand=True, fill='both')
+
+        self.path_label = tk.Label(self.path_frame, text=ENTRY_PATH_TEXT)
+        self.path_label.pack(side='left')
+
+        self.path_entry_text_var = tk.StringVar(self.path_frame)
+        self.path_entry = tk.Entry(self.path_frame, text=self.path_entry_text_var)
+        self.path_entry.pack(side='left')
+
+        self.path_browse_button = tk.Button(
+            self.path_frame,
+            text=BROWSE_BUTTON_TEXT,
+            command=self._update_path_entry
+        )
+        self.path_browse_button.pack(side='left')
+
+        self.accept_frame = tk.Frame(self)
+        self.accept_frame.pack(side='bottom', expand=True, fill='both')
+
+        self.accept_button = tk.Button(
+            self.accept_frame,
+            text=ACCEPT_BUTTON_TEXT,
+            command=self._add_entry
+        )
+        self.accept_button.pack(side='left')
+
+
+    def _update_path_entry(self):
+        path = filedialog.askopenfile().name
+        self.path_entry_text_var.set(path)
+
+
+    def _add_entry(self):
+        if self.name_entry.get() == '' or self.path_entry.get() == '':
+            logging.debug(f'M: The name or the path were empty. Nothing was added.')
+            return
+        # TODO add
+        self.master._add_entry(self.name_entry.get(), self.path_entry.get())
+        logging.debug(f'M: The entry was added successfully.')
+        self.grab_release()
+        self.destroy()
 
 
 class MainView(tk.Toplevel):
@@ -22,6 +88,8 @@ class MainView(tk.Toplevel):
         self.title(TITLE)
 
         self.callbacks = []
+        self.entry_name = None
+        self.new_entry_path = None
 
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side='top', expand=True, fill='both')
@@ -73,13 +141,22 @@ class MainView(tk.Toplevel):
         self.callbacks.append(func)
 
 
+    def remove_callback(self, func):
+        self.callbacks.remove(func)
+
+
     def _from_indices(self, indices):
         return [self.sample_list.get(i) for i in indices]
 
 
     def _do_callbacks(self):
+        data = {
+            SELECTION: self._from_indices(self.sample_list.curselection()),
+            NAME: self.entry_name,
+            PATH: self.new_entry_path
+        }
         for func in self.callbacks:
-            func(self._from_indices(self.sample_list.curselection()))
+            func(**data)
 
 
     def _listbox_select_handler(self):
@@ -106,3 +183,14 @@ class MainView(tk.Toplevel):
             self.concat_button.config(state=tk.NORMAL)
         else:
             self.concat_button.config(state=tk.DISABLED)
+
+
+    def add_entry_dialog(self):
+        dialog = AddView(self)
+        dialog.grab_set()
+
+
+    def _add_entry(self, name, path):
+        self.entry_name = name
+        self.new_entry_path = path
+        self._do_callbacks()
