@@ -15,6 +15,7 @@ PLAY_TEXT = 'Play'
 CONCAT_TEXT = 'Merge Audio'
 ADD_TITLE = 'Add Entry'
 RENAME_TITLE = 'Rename Entry'
+PATH_ENTRY_TITLE = 'Choose an audio file...'
 CONCAT_TITLE = CONCAT_TEXT
 ENTRY_NAME_TEXT = 'Name:'
 NEW_ENTRY_NAME_TEXT = 'New name:'
@@ -68,7 +69,15 @@ class AddView(tk.Toplevel):
 
 
     def _update_path_entry(self):
-        path = filedialog.askopenfile().name
+        path = filedialog.askopenfilename(
+            title=PATH_ENTRY_TITLE,
+            filetypes=(
+                ('MPEG-4 Audio Files', '*.m4a'),
+                ('WAV Files', '*.wav'),
+                ('All Files', '*.*'),
+            ),
+            defaultextension='.m4a'
+        )
         self.path_entry_text_var.set(path)
 
 
@@ -248,10 +257,10 @@ class MainView(tk.Toplevel):
         filename = filedialog.asksaveasfilename(
             title=CONCAT_TITLE,
             filetypes=(
-                ('MPEG-4 Audio Files', '*.m4a'),
+                ('WAV Files', '*.wav'),
                 ('All Files', '*.*'),
             ),
-            defaultextension='.m4a'
+            defaultextension='.wav'
         )
         if filename and filename != '':
             logging.debug(f'V: Passing the following audio filename to the controller: {filename}')
