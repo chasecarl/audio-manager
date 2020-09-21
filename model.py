@@ -1,6 +1,9 @@
 import os
 
 
+ENTRY_EXT = '.amf'
+
+
 class EntryModel:
 
     def __init__(self, entry_path):
@@ -18,3 +21,14 @@ class EntryModel:
                 self.audio_path
             ))
             entry_fd.truncate()
+
+
+class ListModel(list):
+
+    ENTRIES_FOLDER_PATH = 'res'
+
+    def __init__(self):
+        list.__init__(self)
+        for entry_path in os.listdir(ListModel.ENTRIES_FOLDER_PATH):
+            if entry_path.endswith(ENTRY_EXT):
+                self.append(EntryModel(os.join((ListModel.ENTRIES_FOLDER_PATH, entry_path))))
