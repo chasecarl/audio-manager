@@ -1,5 +1,7 @@
 import os
 import logging
+import librosa
+import soundfile as sf
 
 
 ENTRY_EXT = '.amf'
@@ -39,6 +41,10 @@ class EntryModel:
 
     def __str__(self):
         return self.name
+
+
+    def load_audio(self):
+        return librosa.load(self.audio_path)
 
 
 class ListModel(list):
