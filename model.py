@@ -96,3 +96,7 @@ class ListModel(list):
         to_rename = self.selected[0]
         to_rename.set_name(name)
         self._do_callbacks()
+
+
+    def concat_audio(self, audio_filename):
+        pass

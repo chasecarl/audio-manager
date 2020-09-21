@@ -15,6 +15,7 @@ PLAY_TEXT = 'Play'
 CONCAT_TEXT = 'Merge Audio'
 ADD_TITLE = 'Add Entry'
 RENAME_TITLE = 'Rename Entry'
+CONCAT_TITLE = CONCAT_TEXT
 ENTRY_NAME_TEXT = 'Name:'
 NEW_ENTRY_NAME_TEXT = 'New name:'
 ENTRY_PATH_TEXT = 'Audio file path:'
@@ -84,9 +85,6 @@ class AddView(tk.Toplevel):
 class RenameView(tk.Toplevel):
 
     def __init__(self, master):
-        tk.Toplevel.__init__(self, master)
-        self.master = master
-        self.title(RENAME_TITLE)
 
         self.name_frame = tk.Frame(self)
         self.name_frame.pack(side='top', expand=True, fill='both')
@@ -128,6 +126,7 @@ class MainView(tk.Toplevel):
         self.callbacks = []
         self.entry_name = None
         self.new_entry_path = None
+        self.audio_filename = None
 
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side='top', expand=True, fill='both')
@@ -190,8 +189,9 @@ class MainView(tk.Toplevel):
     def _do_callbacks(self):
         data = {
             SELECTION: self._from_indices(self.sample_list.curselection()),
-            NAME: self.entry_name,
-            PATH: self.new_entry_path
+            ENTRY_NAME: self.entry_name,
+            ENTRY_PATH: self.new_entry_path,
+            AUDIO_FILENAME: self.audio_filename
         }
         for func in self.callbacks:
             func(**data)
@@ -242,3 +242,18 @@ class MainView(tk.Toplevel):
     def _rename_entry(self, name):
         self.entry_name = name
         self._do_callbacks()
+
+
+    def save_concat_audio_dialog(self):
+        filename = filedialog.asksaveasfilename(
+            title=CONCAT_TITLE,
+            filetypes=(
+                ('MPEG-4 Audio Files', '*.m4a'),
+                ('All Files', '*.*'),
+            ),
+            defaultextension='.m4a'
+        )
+        if filename and filename != '':
+            logging.debug(f'V: Passing the following audio filename to the controller: {filename}')
+            self.audio_filename = filename
+            self._do_callbacks()

@@ -7,8 +7,9 @@ ENV_LOGGING_LEVEL_VARNAME = 'LOGLEVEL'
 
 
 SELECTION = 'selection'
-NAME = 'name'
-PATH = 'path'
+ENTRY_NAME = 'name'
+ENTRY_PATH = 'path'
+AUDIO_FILENAME = 'audio'
 
 
 logging_level = os.environ.get(ENV_LOGGING_LEVEL_VARNAME)

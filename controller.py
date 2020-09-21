@@ -30,6 +30,7 @@ class Controller:
         self.view.add_button.config(command=self.add_entry)
         self.view.remove_button.config(command=self.remove_entry)
         self.view.rename_button.config(command=self.rename_entry)
+        self.view.concat_button.config(command=self.concat_audio)
 
 
     def selection_changed(self, **kwargs):
@@ -39,18 +40,25 @@ class Controller:
 
 
     def entry_added(self, **kwargs):
-        name = kwargs[NAME]
-        path = kwargs[PATH]
+        name = kwargs[ENTRY_NAME]
+        path = kwargs[ENTRY_PATH]
         self.view.remove_callback(self.entry_added)
         logging.debug(f'C: Passing the following entry to the model: {name}, {path}')
         self.model.add_entry(name, path)
 
 
     def entry_renamed(self, **kwargs):
-        name = kwargs[NAME]
+        name = kwargs[ENTRY_NAME]
         self.view.remove_callback(self.entry_renamed)
         logging.debug(f'C: Passing the following entry name to the model: {name}')
         self.model.rename_entry(name)
+
+
+    def audio_saved(self, **kwargs):
+        audio_filename = kwargs[AUDIO_FILENAME]
+        self.view.remove_callback(self.audio_saved)
+        logging.debug(f'C: Passing the following audio filename to the model: {audio_filename}')
+        self.model.concat_audio(audio_filename)
 
 
     def model_changed(self):
@@ -58,8 +66,8 @@ class Controller:
 
 
     def add_entry(self):
-        self.view.add_entry_dialog()
         self.view.add_callback(self.entry_added)
+        self.view.add_entry_dialog()
 
 
     def remove_entry(self):
@@ -67,8 +75,13 @@ class Controller:
 
 
     def rename_entry(self):
-        self.view.rename_entry_dialog()
         self.view.add_callback(self.entry_renamed)
+        self.view.rename_entry_dialog()
+
+
+    def concat_audio(self):
+        self.view.add_callback(self.audio_saved)
+        self.view.save_concat_audio_dialog()
 
 
 if __name__ == '__main__':
