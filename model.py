@@ -23,6 +23,10 @@ class EntryModel:
             entry_fd.truncate()
 
 
+    def __str__(self):
+        return self.name
+
+
 class ListModel(list):
 
     ENTRIES_FOLDER_PATH = 'res'
