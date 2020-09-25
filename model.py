@@ -27,7 +27,7 @@ class EntryModel:
 
     def __init__(self, entry_path):
         self._entry_path = entry_path
-        with open(self._entry_path) as entry_fd:
+        with open(self._entry_path, encoding='utf8') as entry_fd:
             self.name = next(entry_fd).strip()
             self.audio_path = next(entry_fd).strip()
 
@@ -35,7 +35,7 @@ class EntryModel:
     @classmethod
     def write(cls, name, audio_path):
         entry_path = os.path.join(ENTRIES_FOLDER_PATH, f'{name}{ENTRY_EXT}')
-        with open(entry_path, 'w') as entry_fd:
+        with open(entry_path, 'w', encoding='utf8') as entry_fd:
             entry_fd.writelines((
                 f'{name}\n',
                 audio_path
@@ -45,7 +45,7 @@ class EntryModel:
 
     def set_name(self, name):
         self.name = name
-        with open(self._entry_path, 'w') as entry_fd:
+        with open(self._entry_path, 'w', encoding='utf8') as entry_fd:
             entry_fd.writelines((
                 f'{self.name}\n',
                 self.audio_path
