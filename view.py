@@ -76,7 +76,8 @@ class AddView(tk.Toplevel):
                 ('WAV Files', '*.wav'),
                 ('All Files', '*.*'),
             ),
-            defaultextension='.m4a'
+            defaultextension='.m4a',
+            initialdir='./res/'
         )
         self.path_entry_text_var.set(path)
 
@@ -264,7 +265,8 @@ class MainView(tk.Toplevel):
                 ('WAV Files', '*.wav'),
                 ('All Files', '*.*'),
             ),
-            defaultextension='.wav'
+            defaultextension='.wav',
+            initialdir='./res/'
         )
         if filename and filename != '':
             logging.debug(f'V: Passing the following audio filename to the controller: {filename}')
