@@ -30,6 +30,7 @@ class Controller:
     def entry_added(self, **kwargs):
         name = kwargs[ENTRY_NAME]
         path = kwargs[ENTRY_PATH]
+        # FIXME sometimes the callback is still there on the next iteration
         self.view.remove_callback(self.entry_added)
         logging.debug(f'C: Passing the following entry to the model: {name}, {path}')
         self.model.add_entry(name, path)
