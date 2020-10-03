@@ -1,7 +1,8 @@
 import os
 import logging
 import abc
-from typing import Tuple
+from typing import Tuple, Iterable
+from collections import deque
 
 from pydub import AudioSegment
 
@@ -91,39 +92,61 @@ class RawTextAudioEntry(AudioEntry):
         return audio, audio.frame_rate
 
 
-class ListModel(list):
+class AudioCollection(dict, metaclass=abc.ABCMeta):
+
+    """A collection of audio entries."""
 
     def __init__(self):
-        list.__init__(self)
-        for entry_path in os.listdir(ENTRIES_FOLDER_PATH):
-            if entry_path.endswith(ENTRY_EXT):
-                self.append(EntryModel(os.path.join(ENTRIES_FOLDER_PATH, entry_path)))
-        self.selected = []
-        self.callbacks = []
+        dict.__init__(self)
+        self.load()
+        self._names_selected = deque()
 
+    @abc.abstractmethod
+    def add(self, names: Iterable[str], audio_paths: Iterable[str]) -> None:
+        """Adds entries to the collection."""
+        raise NotImplementedError
 
-    def set_selected(self, selection):
-        self.selected = [entry for entry in self if entry.name in selection]
+    @abc.abstractmethod
+    def remove(self, names: Iterable[str]) -> None:
+        """Removes entries from the collection."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def rename(self, name: str, new_name: str) -> None:
+        """Renames an entry."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def load(self) -> None:
+        """Loads all the entries."""
+        raise NotImplementedError
+
+    def select(self, names: Iterable[str]) -> None:
+        """Adds names to the selection."""
+        self._names_selected.extend(names)
         logging.debug(f'M: Current selection is: {self._str_selected()}.')
 
+    def deselect(self, names: Iterable[str]) -> None:
+        """Removes names to the selection."""
+        for name in names:
+            self._names_selected.remove(name)
+        logging.debug(f'M: Current selection is: {self._str_selected()}.')
 
-    def _str_selected(self):
-        return '[' + ', '.join(str(entry) for entry in self.selected) + ']'
+    def concat_audio(self, audio_filename):
+        if len(self._names_selected) < 2:
+            logging.error(f'M: Audio concatenation function is called with less than two entries selected. Aborting.')
+            return
+        on = AudioSegment.silent(PAUSE_SECS * 1000)
+        result, sr = self[self._names_selected[0]].load_audio()
+        for sample_name in self._names_selected[1:]:
+            audio, sample_sr = self[sample_name].load_audio()
+            if sample_sr != sr:
+                logging.warning(f'M: Audio samples have different sampling rate, writing with the first encountered one.')
+            result += on
+            result += audio
+        result.export(audio_filename, format='wav')
+        logging.debug(f'M: Concatenated audio was written successfully!')
 
-
-    def add_callback(self, func):
-        self.callbacks.append(func)
-
-
-    def _do_callbacks(self):
-        for func in self.callbacks:
-            func()
-
-
-    def add_entry(self, name, path):
-        new_entry = EntryModel.write(name, path)
-        self.append(new_entry)
-        self._do_callbacks()
 
 
     def remove_entry(self):
