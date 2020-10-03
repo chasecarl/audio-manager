@@ -162,7 +162,33 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         logging.debug(f'M: Concatenated audio was written successfully!')
 
 
-class RawTextAudioCollection:
+class RawTextAudioCollection(AudioCollection):
+
+    """An audio collection that uses entries stored in raw text files."""
+
+    def add(self, names: Iterable[str], audio_paths: Iterable[str]) -> None:
+        for name, audio_path in zip(names, audio_paths):
+            if name in self.keys():
+                continue
+            entry = RawTextAudioEntry(name, audio_path)
+            self[name] = entry
+            entry.save()
+
+    def remove(self, names: Iterable[str]) -> None:
+        for name in names:
+            # TODO logging.error for consistency with deselect?
+            self.pop(name, None)  # doesn't throw an exception if there is no such entry
+        self.deselect(names)
+
+    def rename(self, name: str, new_name: str) -> None:
+        entry = self[name]
+        entry.set_name(new_name)
+        try:
+            i = self._names_selected.index(name)
+            self._names_selected.insert(i, new_name)
+            self._names_selected.remove(name)
+        except ValueError:
+            logging.error(f'M: Item isn\'t selected when renaming: {name}')
 
     def load(self, dir=ENTRIES_FOLDER_PATH) -> None:
         for entry_path in os.listdir(dir):
