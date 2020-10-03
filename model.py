@@ -122,15 +122,28 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         """Loads all the entries."""
         raise NotImplementedError
 
+    def _str_selected(self) -> str:
+        return '[' + ', '.join(str(entry) for entry in self._names_selected) + ']'
+
     def select(self, names: Iterable[str]) -> None:
         """Adds names to the selection."""
-        self._names_selected.extend(names)
+        for name in names:
+            if name not in self.keys():
+                logging.error(f'M: Trying to select an item that isn\'t a part of the collection: {name}')
+                continue
+            self._names_selected.append(name)
         logging.debug(f'M: Current selection is: {self._str_selected()}.')
 
     def deselect(self, names: Iterable[str]) -> None:
         """Removes names from the selection."""
         for name in names:
-            self._names_selected.remove(name)
+            if name not in self.keys():
+                logging.error(f'M: Trying to deselect an item that isn\'t a part of the collection: {name}')
+                continue
+            try:
+                self._names_selected.remove(name)
+            except ValueError:
+                logging.error(f'M: Trying to deselect an item that isn\'t selected: {name}')
         logging.debug(f'M: Current selection is: {self._str_selected()}.')
 
     def concat_audio(self, audio_filename):
