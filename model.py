@@ -148,16 +148,23 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         logging.debug(f'M: Concatenated audio was written successfully!')
 
 
+class RawTextAudioCollection:
 
-    def remove_entry(self):
-        if len(self.selected) == 0:
-            logging.error(f'M: Remove is called with an empty selection. Not removing.')
-            return
-        for to_remove in self.selected:
-            self.remove(to_remove)
-            os.remove(to_remove._entry_path)
-        self._do_callbacks()
+    def load(self, dir=ENTRIES_FOLDER_PATH) -> None:
+        for entry_path in os.listdir(dir):
+            if entry_path.endswith(ENTRY_EXT):
+                with open(entry_path, encoding='utf8') as entry_fd:
+                    self.name = next(entry_fd).strip()
+                    self.audio_path = next(entry_fd).strip()
+                entry = self.Entry(os.path.join(dir, entry_path))
+                self[entry.get_name()] = entry
 
+    def select(self, newly_selected_entries_names: Iterable[str]) -> None:
+        self._names_selected.extend(newly_selected_entries_names)
+        logging.debug(f'M: Current selection is: {self._str_selected()}.')
+
+    def _str_selected(self) -> str:
+        return '[' + ', '.join(str(entry) for entry in self._names_selected) + ']'
 
     def rename_entry(self, name):
         if len(self.selected) == 0:
@@ -169,19 +176,3 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         to_rename = self.selected[0]
         to_rename.set_name(name)
         self._do_callbacks()
-
-
-    def concat_audio(self, audio_filename):
-        if len(self.selected) < 2:
-            logging.error(f'M: Audio concatenation function is called with less than two entries selected. Aborting.')
-            return
-        on = AudioSegment.silent(PAUSE_SECS * 1000)
-        result, sr = self.selected[0].load_audio()
-        for sample in self.selected[1:]:
-            audio, sample_sr = sample.load_audio()
-            if sample_sr != sr:
-                logging.warning(f'M: Audio samples have different sampling rate, writing with the first encountered one.')
-            result += on
-            result += audio
-        result.export(audio_filename, format='wav')
-        logging.debug(f'M: Concatenated audio was written successfully!')
