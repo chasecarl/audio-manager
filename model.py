@@ -127,7 +127,7 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         logging.debug(f'M: Current selection is: {self._str_selected()}.')
 
     def deselect(self, names: Iterable[str]) -> None:
-        """Removes names to the selection."""
+        """Removes names from the selection."""
         for name in names:
             self._names_selected.remove(name)
         logging.debug(f'M: Current selection is: {self._str_selected()}.')
