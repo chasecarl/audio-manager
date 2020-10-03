@@ -60,6 +60,7 @@ class AudioEntry(metaclass=abc.ABCMeta):
 class RawTextAudioEntry(AudioEntry):
 
     """An audio entry that is stored in a raw text file."""
+    # TODO the strange thing is that it if the file is not in the default directory it will be created
 
     def __init__(self, name, audio_path, dir=ENTRIES_FOLDER_PATH):
         self.dir = dir
