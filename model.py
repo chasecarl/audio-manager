@@ -28,10 +28,15 @@ class AudioEntry(metaclass=abc.ABCMeta):
                 and (
                     callable(subclass.load_audio)
                     or NotImplemented
+                )
+                and hasattr(subclass, 'set_name')
+                and (
+                    callable(subclass.set_name)
+                    or NotImplemented
                 ))
 
     @abc.abstractmethod
-    def save(self, name: str) -> None:
+    def save(self) -> None:
         """Saves the entry to the disk."""
         raise NotImplementedError
 
@@ -40,6 +45,10 @@ class AudioEntry(metaclass=abc.ABCMeta):
         """Loads audio of the entry."""
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def set_name(self, name: str) -> None:
+        """Sets the name of the entry and saves it."""
+        raise NotImplementedError
 
 class EntryModel:
 
