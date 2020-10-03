@@ -50,6 +50,11 @@ class AudioEntry(metaclass=abc.ABCMeta):
         """Sets the name of the entry and saves it."""
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def get_name(self) -> str:
+        """Returns the name of the entry."""
+        raise NotImplementedError
+
 
 class RawTextAudioEntry(AudioEntry):
 
