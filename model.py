@@ -1,5 +1,8 @@
 import os
 import logging
+import abc
+from typing import Tuple
+
 from pydub import AudioSegment
 
 
@@ -8,6 +11,34 @@ ENTRY_EXT = '.amf'
 ENTRIES_FOLDER_PATH = 'res'
 
 PAUSE_SECS = 2
+
+
+class AudioEntry(metaclass=abc.ABCMeta):
+
+    """An interface that represents an audio entry."""
+
+    @classmethod
+    def __subclasshook__(cls, subclass) -> bool:
+        return (hasattr(subclass, 'save')
+                and (
+                    callable(subclass.save)
+                    or NotImplemented
+                )
+                and hasattr(subclass, 'load_audio')
+                and (
+                    callable(subclass.load_audio)
+                    or NotImplemented
+                ))
+
+    @abc.abstractmethod
+    def save(self, name: str) -> None:
+        """Saves the entry to the disk."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def load_audio(self) -> Tuple[AudioSegment, int]:
+        """Loads audio of the entry."""
+        raise NotImplementedError
 
 
 class EntryModel:
