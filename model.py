@@ -60,14 +60,16 @@ class RawTextAudioEntry(AudioEntry):
 
     """An audio entry that is stored in a raw text file."""
 
-    def __init__(self, entry_path):
-        self._entry_path = entry_path
-        with open(self._entry_path, encoding='utf8') as entry_fd:
-            self.name = next(entry_fd).strip()
-            self.audio_path = next(entry_fd).strip()
+    def __init__(self, name, audio_path, dir=ENTRIES_FOLDER_PATH):
+        self.dir = dir
+        self._entry_path = None
+        self.name = name
+        self.audio_path = audio_path
 
     def save(self) -> None:
-        with open(self.entry_path, 'w', encoding='utf8') as entry_fd:
+        if not self._entry_path:
+            self._entry_path = os.path.join(self.dir, f'{self.name}{ENTRY_EXT}')
+        with open(self._entry_path, 'w', encoding='utf8') as entry_fd:
             entry_fd.writelines((
                 f'{self.name}\n',
                 self.audio_path
@@ -77,6 +79,9 @@ class RawTextAudioEntry(AudioEntry):
     def set_name(self, name: str) -> None:
         self.name = name
         self.save()
+
+    def get_name(self) -> str:
+        return self.name
 
     def __str__(self) -> str:
         return self.name
