@@ -194,25 +194,7 @@ class RawTextAudioCollection(AudioCollection):
         for entry_path in os.listdir(dir):
             if entry_path.endswith(ENTRY_EXT):
                 with open(entry_path, encoding='utf8') as entry_fd:
-                    self.name = next(entry_fd).strip()
-                    self.audio_path = next(entry_fd).strip()
-                entry = self.Entry(os.path.join(dir, entry_path))
+                    name = next(entry_fd).strip()
+                    audio_path = next(entry_fd).strip()
+                entry = RawTextAudioEntry(name, audio_path)
                 self[entry.get_name()] = entry
-
-    def select(self, newly_selected_entries_names: Iterable[str]) -> None:
-        self._names_selected.extend(newly_selected_entries_names)
-        logging.debug(f'M: Current selection is: {self._str_selected()}.')
-
-    def _str_selected(self) -> str:
-        return '[' + ', '.join(str(entry) for entry in self._names_selected) + ']'
-
-    def rename_entry(self, name):
-        if len(self.selected) == 0:
-            logging.error(f'M: Rename is called with an empty selection. Not removing.')
-            return
-        if len(self.selected) > 1:
-            logging.error(f'M: Rename is called with more than one entry selected. Not renaming.')
-            return
-        to_rename = self.selected[0]
-        to_rename.set_name(name)
-        self._do_callbacks()
