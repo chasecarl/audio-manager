@@ -50,7 +50,10 @@ class AudioEntry(metaclass=abc.ABCMeta):
         """Sets the name of the entry and saves it."""
         raise NotImplementedError
 
-class EntryModel:
+
+class RawTextAudioEntry(AudioEntry):
+
+    """An audio entry that is stored in a raw text file."""
 
     def __init__(self, entry_path):
         self._entry_path = entry_path
@@ -58,33 +61,22 @@ class EntryModel:
             self.name = next(entry_fd).strip()
             self.audio_path = next(entry_fd).strip()
 
-
-    @classmethod
-    def write(cls, name, audio_path):
-        entry_path = os.path.join(ENTRIES_FOLDER_PATH, f'{name}{ENTRY_EXT}')
-        with open(entry_path, 'w', encoding='utf8') as entry_fd:
-            entry_fd.writelines((
-                f'{name}\n',
-                audio_path
-            ))
-        return cls(entry_path)
-
-
-    def set_name(self, name):
-        self.name = name
-        with open(self._entry_path, 'w', encoding='utf8') as entry_fd:
+    def save(self) -> None:
+        with open(self.entry_path, 'w', encoding='utf8') as entry_fd:
             entry_fd.writelines((
                 f'{self.name}\n',
                 self.audio_path
             ))
             entry_fd.truncate()
 
+    def set_name(self, name: str) -> None:
+        self.name = name
+        self.save()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-
-    def load_audio(self):
+    def load_audio(self) -> Tuple[AudioSegment, int]:
         audio = AudioSegment.from_file(self.audio_path)
         return audio, audio.frame_rate
 
