@@ -67,7 +67,7 @@ class Controller:
         self._dispose_current_dialog()
 
     def dialog_concat_audio(self):
-        filename = filedialog.asksaveasfilename(
+        filepath = filedialog.asksaveasfilename(
             title=CONCAT_TITLE,
             filetypes=(
                 ('WAV Files', '*.wav'),
@@ -76,8 +76,8 @@ class Controller:
             defaultextension='.wav',
             initialdir='./res/'
         )
-        if filename:
-            self.model.concat_audio(filename)
+        if filepath:
+            self.model.concat_audio(filepath)
 
     def _listbox_select_handler(self):
         view_selection = self.view.selection()

@@ -164,7 +164,7 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         """Returns the names of currently selected entries."""
         return self._names_selected
 
-    def concat_audio(self, audio_filename):
+    def concat_audio(self, output_audio_filepath):
         if len(self._names_selected) < 2:
             logging.error(f'M: Audio concatenation function is called with less than two entries selected. Aborting.')
             return
@@ -176,7 +176,7 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
                 logging.warning(f'M: Audio samples have different sampling rate, writing with the first encountered one.')
             result += on
             result += audio
-        result.export(audio_filename, format='wav')
+        result.export(output_audio_filepath, format='wav')
         logging.debug(f'M: Concatenated audio was written successfully!')
 
     def add_callback(self, func):
