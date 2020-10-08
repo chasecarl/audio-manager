@@ -157,10 +157,10 @@ class MainView(tk.Toplevel):
             self.entries_listbox.insert(tk.END, entry_name)
 
     def selection(self):
-        return map(
+        return list(map(
             lambda i: self.entries_listbox.get(i),
             self.entries_listbox.curselection()
-        )
+        ))
 
     def listbox_select_handler(self):
         selection_size = len(self.entries_listbox.curselection())

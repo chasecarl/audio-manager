@@ -70,15 +70,15 @@ class Controller:
         self.view.save_concat_audio_dialog()
 
     def _listbox_select_handler(self):
-        selection = self.view.selection()
-        logging.debug(f'C: View selection before listbox handler: {list(selection)}')
+        view_selection = self.view.selection()
+        logging.debug(f'C: View selection before listbox handler: {view_selection}')
         model_selection = list(self.model.names_selected())
         logging.debug(f'C: Model selection before listbox handler: {model_selection}')
-        for view_entry in selection:
+        for view_entry in view_selection:
             if view_entry not in model_selection:
                 self.model.select((view_entry, ))
         for model_entry in model_selection:
-            if model_entry not in selection:
+            if model_entry not in view_selection:
                 self.model.deselect((model_entry, ))
         logging.debug(f'C: View selection after listbox handler: {list(self.view.selection())}')
         logging.debug(f'C: Model selection after listbox handler: {list(self.model.names_selected())}')
