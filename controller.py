@@ -2,15 +2,15 @@ import tkinter as tk
 import logging
 
 
-from view import MainView
-from model import ListModel
+from view import *
+from model import RawTextAudioCollection
 from util import *
 
 
 class Controller:
 
     def __init__(self, root):
-        self.model = ListModel()
+        self.model = RawTextAudioCollection()
         self.view = MainView(root)
         self.model.add_callback(self.model_changed)
         self.view.add_callback(self.selection_changed)
