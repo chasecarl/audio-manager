@@ -170,7 +170,7 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
             return
         on = AudioSegment.silent(PAUSE_SECS * 1000)
         result, sr = self[self._names_selected[0]].load_audio()
-        for sample_name in self._names_selected[1:]:
+        for sample_name in list(self._names_selected)[1:]:
             audio, sample_sr = self[sample_name].load_audio()
             if sample_sr != sr:
                 logging.warning(f'M: Audio samples have different sampling rate, writing with the first encountered one.')
