@@ -126,7 +126,6 @@ class MainView(tk.Toplevel):
         self.top_left.pack(side='left', expand=True, fill='both')
 
         self.entries_listbox = tk.Listbox(self.top_left, selectmode='extended')
-        self.entries_listbox.bind('<<ListboxSelect>>', lambda e: self._listbox_select_handler())
         self.entries_listbox.pack(side='top', anchor='w')
 
         self.top_right = tk.Frame(self.top_frame)
@@ -157,7 +156,7 @@ class MainView(tk.Toplevel):
         for entry_name in entries.keys():
             self.entries_listbox.insert(tk.END, entry_name)
 
-    def _listbox_select_handler(self):
+    def listbox_select_handler(self):
         selection_size = len(self.entries_listbox.curselection())
         logging.debug(f'V: Selection size is {selection_size}')
         # remove button logic
