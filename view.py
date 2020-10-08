@@ -63,10 +63,8 @@ class AddView(tk.Toplevel):
         self.accept_button = tk.Button(
             self.accept_frame,
             text=ACCEPT_BUTTON_TEXT,
-            command=self._add_entry
         )
         self.accept_button.pack(side='left')
-
 
     def _update_path_entry(self):
         path = filedialog.askopenfilename(
@@ -80,16 +78,6 @@ class AddView(tk.Toplevel):
             initialdir='./res/'
         )
         self.path_entry_text_var.set(path)
-
-
-    def _add_entry(self):
-        if self.name_entry.get() == '' or self.path_entry.get() == '':
-            logging.debug(f'M: The name or the path were empty. Nothing was added.')
-            return
-        self.master._add_entry(self.name_entry.get(), self.path_entry.get())
-        logging.debug(f'M: The entry was added successfully.')
-        self.grab_release()
-        self.destroy()
 
 
 class RenameView(tk.Toplevel):
@@ -115,19 +103,8 @@ class RenameView(tk.Toplevel):
         self.accept_button = tk.Button(
             self.accept_frame,
             text=ACCEPT_BUTTON_TEXT,
-            command=self._rename_entry
         )
         self.accept_button.pack(side='left')
-
-
-    def _rename_entry(self):
-        if self.name_entry.get() == '':
-            logging.debug(f'M: The name was empty. Nothing was added.')
-            return
-        self.master._rename_entry(self.name_entry.get())
-        logging.debug(f'M: The entry was renamed successfully.')
-        self.grab_release()
-        self.destroy()
 
 
 class MainView(tk.Toplevel):
@@ -136,11 +113,6 @@ class MainView(tk.Toplevel):
         tk.Toplevel.__init__(self, master)
         self.protocol('WM_DELETE_WINDOW', self.master.destroy)
         self.title(TITLE)
-
-        self.callbacks = []
-        self.entry_name = None
-        self.new_entry_path = None
-        self.audio_filename = None
 
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side='top', expand=True, fill='both')
@@ -153,9 +125,9 @@ class MainView(tk.Toplevel):
         self.top_left = tk.Frame(self.top_frame)
         self.top_left.pack(side='left', expand=True, fill='both')
 
-        self.sample_list = tk.Listbox(self.top_left, selectmode='extended')
-        self.sample_list.bind('<<ListboxSelect>>', lambda e: self._listbox_select_handler())
-        self.sample_list.pack(side='top', anchor='w')
+        self.entries_listbox = tk.Listbox(self.top_left, selectmode='extended')
+        self.entries_listbox.bind('<<ListboxSelect>>', lambda e: self._listbox_select_handler())
+        self.entries_listbox.pack(side='top', anchor='w')
 
         self.top_right = tk.Frame(self.top_frame)
         self.top_right.pack(side='right', expand=True, fill='both')
@@ -180,40 +152,13 @@ class MainView(tk.Toplevel):
         self.concat_button = tk.Button(self.bot_frame, state=tk.DISABLED, text=CONCAT_TEXT)
         self.concat_button.pack(side='left')
 
-
-    def display_samples(self, samples):
-        self.sample_list.delete(0, tk.END)
-        for sample in samples:
-            self.sample_list.insert(tk.END, sample)
-        self._do_callbacks()
-
-
-    def add_callback(self, func):
-        self.callbacks.append(func)
-
-
-    def remove_callback(self, func):
-        self.callbacks.remove(func)
-
-
-    def _from_indices(self, indices):
-        return [self.sample_list.get(i) for i in indices]
-
-
-    def _do_callbacks(self):
-        data = {
-            SELECTION: self._from_indices(self.sample_list.curselection()),
-            ENTRY_NAME: self.entry_name,
-            ENTRY_PATH: self.new_entry_path,
-            AUDIO_FILENAME: self.audio_filename
-        }
-        for func in self.callbacks:
-            func(**data)
-
+    def display(self, entries):
+        self.entries_listbox.delete(0, tk.END)
+        for entry_name in entries.keys():
+            self.entries_listbox.insert(tk.END, entry_name)
 
     def _listbox_select_handler(self):
-        self._do_callbacks()
-        selection_size = len(self.sample_list.curselection())
+        selection_size = len(self.entries_listbox.curselection())
         logging.debug(f'V: Selection size is {selection_size}')
         # remove button logic
         if selection_size >= 1:
@@ -236,28 +181,6 @@ class MainView(tk.Toplevel):
         else:
             self.concat_button.config(state=tk.DISABLED)
 
-
-    def add_entry_dialog(self):
-        dialog = AddView(self)
-        dialog.grab_set()
-
-
-    def rename_entry_dialog(self):
-        dialog = RenameView(self)
-        dialog.grab_set()
-
-
-    def _add_entry(self, name, path):
-        self.entry_name = name
-        self.new_entry_path = path
-        self._do_callbacks()
-
-
-    def _rename_entry(self, name):
-        self.entry_name = name
-        self._do_callbacks()
-
-
     def save_concat_audio_dialog(self):
         filename = filedialog.asksaveasfilename(
             title=CONCAT_TITLE,
@@ -271,4 +194,3 @@ class MainView(tk.Toplevel):
         if filename and filename != '':
             logging.debug(f'V: Passing the following audio filename to the controller: {filename}')
             self.audio_filename = filename
-            self._do_callbacks()
