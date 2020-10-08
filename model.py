@@ -3,6 +3,7 @@ import logging
 import abc
 from typing import Tuple, Iterable
 from collections import deque
+from functools import wraps
 
 from pydub import AudioSegment
 
@@ -99,8 +100,21 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
 
     def __init__(self):
         dict.__init__(self)
+        self._callbacks = []
         self.load()
         self._names_selected = deque()
+
+    class Decorators:
+        @classmethod
+        def with_callbacks(cls, f):
+            @wraps(f)
+            def wrapper(*args, **kwds):
+                f(*args, **kwds)
+                logging.debug(f'M: Doing callbacks for {f.__name__}...')
+                # args[0] is self
+                args[0]._do_callbacks()
+                logging.debug('M: Done.')
+            return wrapper
 
     @abc.abstractmethod
     def add(self, names: Iterable[str], audio_paths: Iterable[str]) -> None:
@@ -165,11 +179,21 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         result.export(audio_filename, format='wav')
         logging.debug(f'M: Concatenated audio was written successfully!')
 
+    def add_callback(self, func):
+        """Adds a function that is called after every model update (excluding selection changes)."""
+        self._callbacks.append(func)
+
+    def _do_callbacks(self):
+        """Performs all the callbacks."""
+        for func in self._callbacks:
+            func()
+
 
 class RawTextAudioCollection(AudioCollection):
 
     """An audio collection that uses entries stored in raw text files."""
 
+    @AudioCollection.Decorators.with_callbacks
     def add(self, names: Iterable[str], audio_paths: Iterable[str]) -> None:
         for name, audio_path in zip(names, audio_paths):
             if name in self.keys():
@@ -178,12 +202,14 @@ class RawTextAudioCollection(AudioCollection):
             self[name] = entry
             entry.save()
 
+    @AudioCollection.Decorators.with_callbacks
     def remove(self, names: Iterable[str]) -> None:
         for name in names:
             # TODO logging.error for consistency with deselect?
             self.pop(name, None)  # doesn't throw an exception if there is no such entry
         self.deselect(names)
 
+    @AudioCollection.Decorators.with_callbacks
     def rename(self, name: str, new_name: str) -> None:
         entry = self[name]
         entry.set_name(new_name)
@@ -194,6 +220,7 @@ class RawTextAudioCollection(AudioCollection):
         except ValueError:
             logging.error(f'M: Item isn\'t selected when renaming: {name}')
 
+    @AudioCollection.Decorators.with_callbacks
     def load(self, dir=ENTRIES_FOLDER_PATH) -> None:
         for entry_path in os.listdir(dir):
             if entry_path.endswith(ENTRY_EXT):
