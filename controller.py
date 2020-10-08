@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 import logging
 
 
@@ -67,7 +67,17 @@ class Controller:
         self._dispose_current_dialog()
 
     def dialog_concat_audio(self):
-        self.view.save_concat_audio_dialog()
+        filename = filedialog.asksaveasfilename(
+            title=CONCAT_TITLE,
+            filetypes=(
+                ('WAV Files', '*.wav'),
+                ('All Files', '*.*'),
+            ),
+            defaultextension='.wav',
+            initialdir='./res/'
+        )
+        if filename:
+            self.model.concat_audio(filename)
 
     def _listbox_select_handler(self):
         view_selection = self.view.selection()
