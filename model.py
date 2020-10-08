@@ -146,6 +146,10 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
                 logging.error(f'M: Trying to deselect an item that isn\'t selected: {name}')
         logging.debug(f'M: Current selection is: {self._str_selected()}.')
 
+    def names_selected(self):
+        """Returns the names of currently selected entries."""
+        return self._names_selected
+
     def concat_audio(self, audio_filename):
         if len(self._names_selected) < 2:
             logging.error(f'M: Audio concatenation function is called with less than two entries selected. Aborting.')
