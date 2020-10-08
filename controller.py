@@ -69,24 +69,18 @@ class Controller:
     def dialog_concat_audio(self):
         self.view.save_concat_audio_dialog()
 
-    def _view_selection(self):
-        return map(
-            lambda i: self.view.entries_listbox.get(i),
-            self.view.entries_listbox.curselection()
-        )
-
     def _listbox_select_handler(self):
-        view_selection = self._view_selection()
-        logging.debug(f'C: View selection before listbox handler: {list(view_selection)}')
+        selection = self.view.selection()
+        logging.debug(f'C: View selection before listbox handler: {list(selection)}')
         model_selection = list(self.model.names_selected())
         logging.debug(f'C: Model selection before listbox handler: {model_selection}')
-        for view_entry in view_selection:
+        for view_entry in selection:
             if view_entry not in model_selection:
                 self.model.select((view_entry, ))
         for model_entry in model_selection:
-            if model_entry not in view_selection:
+            if model_entry not in selection:
                 self.model.deselect((model_entry, ))
-        logging.debug(f'C: View selection after listbox handler: {list(self._view_selection())}')
+        logging.debug(f'C: View selection after listbox handler: {list(self.view.selection())}')
         logging.debug(f'C: Model selection after listbox handler: {list(self.model.names_selected())}')
         self.view.listbox_select_handler()
 
