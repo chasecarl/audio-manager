@@ -197,7 +197,7 @@ class RawTextAudioCollection(AudioCollection):
     def load(self, dir=ENTRIES_FOLDER_PATH) -> None:
         for entry_path in os.listdir(dir):
             if entry_path.endswith(ENTRY_EXT):
-                with open(entry_path, encoding='utf8') as entry_fd:
+                with open(os.path.join(dir, entry_path), encoding='utf8') as entry_fd:
                     name = next(entry_fd).strip()
                     audio_path = next(entry_fd).strip()
                 entry = RawTextAudioEntry(name, audio_path)
