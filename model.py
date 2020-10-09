@@ -75,7 +75,7 @@ class RawTextAudioEntry(AudioEntry):
         with open(self._entry_path, 'w', encoding='utf8') as entry_fd:
             entry_fd.writelines((
                 f'{self.name}\n',
-                self.audio_path
+                os.path.relpath(self.audio_path)
             ))
             entry_fd.truncate()
 
