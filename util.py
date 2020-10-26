@@ -6,10 +6,6 @@ ENV_DEBUG_VARNAME = 'AMDEBUG'
 ENV_LOGGING_LEVEL_VARNAME = 'LOGLEVEL'
 
 
-def basename_without_ext(filepath):
-    return os.path.splitext(os.path.basename(filepath))[0]
-
-
 logging_level = os.environ.get(ENV_LOGGING_LEVEL_VARNAME)
 if not logging_level:
     logging.basicConfig(level=logging.INFO)
@@ -22,3 +18,7 @@ def debugging():
     if result:
         logging.debug(f'Debug check: {result}.')
     return result
+
+
+def basename_without_ext(filepath):
+    return os.path.splitext(os.path.basename(filepath))[0]
