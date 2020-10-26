@@ -6,10 +6,8 @@ ENV_DEBUG_VARNAME = 'AMDEBUG'
 ENV_LOGGING_LEVEL_VARNAME = 'LOGLEVEL'
 
 
-SELECTION = 'selection'
-ENTRY_NAME = 'name'
-ENTRY_PATH = 'path'
-AUDIO_FILENAME = 'audio'
+def basename_without_ext(filepath):
+    return os.path.splitext(os.path.basename(filepath))[0]
 
 
 logging_level = os.environ.get(ENV_LOGGING_LEVEL_VARNAME)

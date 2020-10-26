@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import filedialog
 import logging
 
-
 from util import *
 
 
@@ -37,7 +36,8 @@ class AddView(tk.Toplevel):
         self.name_label = tk.Label(self.name_frame, text=ENTRY_NAME_TEXT)
         self.name_label.pack(side='left')
 
-        self.name_entry = tk.Entry(self.name_frame)
+        self.name_entry_text_var = tk.StringVar(self.name_frame)
+        self.name_entry = tk.Entry(self.name_frame, text=self.name_entry_text_var)
         self.name_entry.pack(side='left')
 
         self.path_frame = tk.Frame(self)
@@ -78,6 +78,8 @@ class AddView(tk.Toplevel):
             initialdir='./res/'
         )
         self.path_entry_text_var.set(path)
+        entry_name = basename_without_ext(path)
+        self.name_entry_text_var.set(entry_name)
 
 
 class RenameView(tk.Toplevel):
