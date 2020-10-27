@@ -22,3 +22,7 @@ def debugging():
 
 def basename_without_ext(filepath):
     return os.path.splitext(os.path.basename(filepath))[0]
+
+
+def default_audio_name(entries_names):
+    return ','.join(entries_names)

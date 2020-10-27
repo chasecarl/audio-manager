@@ -74,7 +74,8 @@ class Controller:
                 ('All Files', '*.*'),
             ),
             defaultextension='.wav',
-            initialdir='./res/'
+            initialdir='./res/',
+            initialfile=default_audio_name(self.model.names_selected())
         )
         if filepath:
             self.model.concat_audio(filepath)
