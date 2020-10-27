@@ -70,10 +70,10 @@ class Controller:
         filepath = filedialog.asksaveasfilename(
             title=CONCAT_TITLE,
             filetypes=(
-                ('WAV Files', '*.wav'),
+                ('m4a Files', '*.m4a'),
                 ('All Files', '*.*'),
             ),
-            defaultextension='.wav',
+            defaultextension='.m4a',
             initialdir='./res/',
             initialfile=default_audio_name(self.model.names_selected())
         )

@@ -1,4 +1,5 @@
 import os
+import subprocess
 import logging
 import abc
 from typing import Tuple, Iterable
@@ -176,7 +177,11 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
                 logging.warning(f'M: Audio samples have different sampling rate, writing with the first encountered one.')
             result += on
             result += audio
-        result.export(output_audio_filepath, format='wav')
+        # we assume that the path contains extension of 3 letters
+        wav_path = f'{output_audio_filepath[:-4]}.wav'
+        result.export(wav_path, format='wav')
+        subprocess.run(['ffmpeg', '-i', wav_path, output_audio_filepath])
+        os.remove(wav_path)
         logging.debug(f'M: Concatenated audio was written successfully!')
 
     def add_callback(self, func):
