@@ -2,7 +2,7 @@ import os
 import subprocess
 import logging
 import abc
-from typing import Tuple, Iterable
+from typing import Tuple, Iterable, Union
 from collections import deque
 from functools import wraps
 
@@ -95,6 +95,15 @@ class RawTextAudioEntry(AudioEntry):
         return audio, audio.frame_rate
 
 
+class EntryExists(Exception):
+    def __init__(self, entry_name=None):
+        msg = 'Entry with this name already exists' 
+        if entry_name:
+            msg += f': {entry_name}'
+        msg += '!'
+        super().__init__(msg)
+
+
 class AudioCollection(dict, metaclass=abc.ABCMeta):
 
     """A collection of audio entries."""
@@ -117,19 +126,49 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
                 logging.debug('M: Done.')
             return wrapper
 
-    @abc.abstractmethod
-    def add(self, names: Iterable[str], audio_paths: Iterable[str]) -> None:
+    @Decorators.with_callbacks
+    def add(self, names: Union[str, Iterable[str]], audio_paths: Union[str, Iterable[str]]) -> None:
         """Adds entries to the collection."""
-        raise NotImplementedError
+        if type(names) == str:
+            assert(type(audio_paths) == str)
+            self._add(names, audio_paths)
+        else:
+            for entry in zip(names, audio_paths):
+                self._add(*entry)
 
     @abc.abstractmethod
-    def remove(self, names: Iterable[str]) -> None:
+    def _add(self, name: str, audio_path: str) -> None:
+        """Adds an entry to the collection."""
+        raise NotImplementedError
+
+    @Decorators.with_callbacks
+    def remove(self, names: Union[str, Iterable[str]]) -> None:
         """Removes entries from the collection."""
-        raise NotImplementedError
+        if type(names) == str:
+            self._remove(names)
+        else:
+            for name in names:
+                self._remove(name)
+        self.deselect(names)
 
     @abc.abstractmethod
-    def rename(self, name: str, new_name: str) -> None:
-        """Renames an entry."""
+    def _remove(self, name: str) -> None:
+        """Removes an entry from the collection."""
+        raise NotImplementedError
+
+    @Decorators.with_callbacks
+    def rename(self, names: Union[str, Iterable[str]], new_names: Union[str, Iterable[str]]) -> None:
+        """Renames entries in the collection."""
+        if type(names) == str:
+            assert(type(new_names) == str)
+            self._rename(names, new_names)
+        else:
+            for entry in zip(names, new_names):
+                self._rename(*entry)
+
+    @abc.abstractmethod
+    def _rename(self, name: str, new_name: str) -> None:
+        """Renames an entry in the collection."""
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -149,8 +188,10 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
             self._names_selected.append(name)
         logging.debug(f'M: Current selection is: {self._str_selected()}.')
 
-    def deselect(self, names: Iterable[str]) -> None:
+    def deselect(self, names: Union[str, Iterable[str]]) -> None:
         """Removes names from the selection."""
+        if type(names) == str:
+            names = (names, )
         for name in names:
             if name not in self.keys():
                 logging.error(f'M: Trying to deselect an item that isn\'t a part of the collection: {name}')
@@ -198,24 +239,18 @@ class RawTextAudioCollection(AudioCollection):
 
     """An audio collection that uses entries stored in raw text files."""
 
-    @AudioCollection.Decorators.with_callbacks
-    def add(self, names: Iterable[str], audio_paths: Iterable[str]) -> None:
-        for name, audio_path in zip(names, audio_paths):
-            if name in self.keys():
-                continue
-            entry = RawTextAudioEntry(name, audio_path)
-            self[name] = entry
-            entry.save()
+    def _add(self, name: str, audio_path: str) -> None:
+        if name in self.keys():
+            raise EntryExists(entry_name=name)
+        entry = RawTextAudioEntry(name, audio_path)
+        self[name] = entry
+        entry.save()
 
-    @AudioCollection.Decorators.with_callbacks
-    def remove(self, names: Iterable[str]) -> None:
-        for name in names:
-            # TODO logging.error for consistency with deselect?
-            self.pop(name, None)  # doesn't throw an exception if there is no such entry
-        self.deselect(names)
+    def _remove(self, name: str) -> None:
+        # TODO logging.error for consistency with deselect?
+        self.pop(name)  # doesn't throw an exception if there is no such entry
 
-    @AudioCollection.Decorators.with_callbacks
-    def rename(self, name: str, new_name: str) -> None:
+    def _rename(self, name: str, new_name: str) -> None:
         entry = self[name]
         entry.set_name(new_name)
         try:
