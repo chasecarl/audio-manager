@@ -38,7 +38,7 @@ class Controller:
 
     def add_entry(self):
         # TODO validate
-        self.model.add((self.current_dialog.name_entry.get(), ), (self.current_dialog.path_entry.get(), ))
+        self.model.add(self.current_dialog.name_entry.get(), self.current_dialog.path_entry.get())
         self._dispose_current_dialog()
 
     def dialog_remove_entry(self):
