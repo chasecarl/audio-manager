@@ -221,7 +221,7 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         # we assume that the path contains extension of 3 letters
         wav_path = f'{output_audio_filepath[:-4]}.wav'
         result.export(wav_path, format='wav')
-        subprocess.run(['ffmpeg', '-i', wav_path, output_audio_filepath])
+        subprocess.run(['ffmpeg', '-y', '-i', wav_path, output_audio_filepath])
         os.remove(wav_path)
         logging.debug(f'M: Concatenated audio was written successfully!')
 
