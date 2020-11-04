@@ -1,4 +1,3 @@
-*.txt
 *.ipynb
 .vscode/
 __pycache__/
