@@ -1,6 +1,8 @@
 import os
 import logging
 
+from typing import Iterable
+
 
 ENV_DEBUG_VARNAME = 'AMDEBUG'
 ENV_LOGGING_LEVEL_VARNAME = 'LOGLEVEL'
@@ -26,3 +28,8 @@ def basename_without_ext(filepath):
 
 def default_audio_name(entries_names):
     return ','.join(entries_names)
+
+def wrap_iterable(iterable_or_single_entry):
+    if not isinstance(iterable_or_single_entry, Iterable) or isinstance(iterable_or_single_entry, str):
+        return [iterable_or_single_entry]
+    return iterable_or_single_entry
