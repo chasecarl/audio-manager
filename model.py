@@ -1,4 +1,5 @@
 import os
+from os.path import basename
 import subprocess
 import logging
 import abc
@@ -176,6 +177,11 @@ class AudioCollection(dict, metaclass=abc.ABCMeta):
         """Loads all the entries."""
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def init_audio_dir(self, audio_dir=ENTRIES_FOLDER_PATH) -> None:
+        """Creates disk entries for audio file in audio_dir."""
+        raise NotImplementedError
+
     def _str_selected(self) -> str:
         return '[' + ', '.join(str(entry) for entry in self._names_selected) + ']'
 
@@ -269,3 +275,15 @@ class RawTextAudioCollection(AudioCollection):
                     audio_path = next(entry_fd).strip()
                 entry = RawTextAudioEntry(name, audio_path)
                 self[entry.get_name()] = entry
+
+    def init_audio_dir(self, audio_dir=ENTRIES_FOLDER_PATH) -> None:
+        for audio_path in os.listdir(audio_dir):
+            if audio_path.endswith('m4a') and ',' not in audio_path:
+                base_name = basename(audio_path)
+                print(f'Basename is {base_name}')
+                audio_path = os.path.join(audio_dir, base_name)
+                print(f'Audio path is {audio_path}')
+                name = os.path.splitext(base_name)[0]
+                print(f'Name is {name}')
+                entry = RawTextAudioEntry(name, audio_path)
+                entry.save()
