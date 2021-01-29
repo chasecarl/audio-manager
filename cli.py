@@ -117,6 +117,8 @@ def interactive_confirm_paths(paths: Iterable[Union[Path, str]], n_recent: Mutab
 
 def interactive_get_paths_to_add() -> Iterable[str]:
     n_recent = mutable_int(interactive_get_int())
+    if n_recent.value == 0:
+        return []
     paths = sorted(Path('res').iterdir(), key=os.path.getmtime)
     return interactive_confirm_paths(paths, n_recent)
 
@@ -137,11 +139,18 @@ def interactive_from_gdrive_table_clipboard() -> Iterable[str]:
 def audio_path_from_names(names: Iterable[str]) -> str:
     return os.path.join(AUDIO_DIR, f'{dan(names)}.m4a')
 
+def interactive_confirm_names_selected(names: Iterable[str]) -> Iterable[str]:
+    dialog_terminated = mutable_bool(False)
+    handlers = {
+        LOOP_DIALOG: lambda: print(f'Your selection is: {names}'),
+        CHOICE_MSG: lambda: print(f'Are you all set?')
+    }
+
 def interactive_process_audio_query(model: Model) -> None:
     names = interactive_from_gdrive_table_clipboard()
     audio_path = audio_path_from_names(names)
+    # model.select(interactive_confirm_names_selected(names))
     model.select(names)
-    # TODO confirm names selected
     print('Writing the audio...')
     model.concat_audio(audio_path)
     print('Audio was written successfully!')
